@@ -71,9 +71,9 @@ def main():
                     if not t:
                         t = 'Unable to identify ticket %s' % ticket
                     zgram.opcode = 'auto'
-                    zgram.fields = ['botathena',
+                    zgram.fields = ['debothena',
                                     '%s ticket %s: %s' % (tracker, ticket, t)]
-                    zgram.sender = 'botathena'
+                    zgram.sender = 'debothena'
                     zgram.send()
                 last_seen[(tracker, ticket)] = time.time()
 
