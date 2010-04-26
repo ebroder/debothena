@@ -24,7 +24,7 @@ def build_matcher(regex, flags=0):
     return match
 
 matchers = (
-    ('Debathena', [build_matcher(r'\btrac[- ]#([0-9]+)\b', re.I)]),
+    ('Debathena', [build_matcher(r'\btrac[-\s:]*#([0-9]+)\b', re.I)]),
 
     ('Debathena', [build_matcher(r'#([0-9]+)\b')])
     )
