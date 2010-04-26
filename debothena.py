@@ -20,12 +20,7 @@ parser = etree.HTMLParser()
 def build_matcher(regex, flags=0):
     r = re.compile(regex, flags)
     def match(zgram):
-        m = r.search(zgram.instance)
-        if m:
-            return m.group(1)
-        m = r.search(zgram.fields[-1])
-        if m:
-            return m.group(1)
+        return r.findall(zgram.instance) + r.findall(zgram.fields[-1])
     return match
 
 matchers = (
@@ -52,9 +47,8 @@ def find_ticket_info(zgram):
     for tracker, ms in matchers:
         for m in ms:
             ticket = m(zgram)
-            if ticket:
-                return tracker, ticket
-    return None, None
+            for t in ticket:
+                yield tracker, t
 
 def main():
     zephyr.init()
@@ -68,8 +62,7 @@ def main():
             continue
         if zgram.opcode.lower() == 'kill':
             sys.exit(0)
-        tracker, ticket = find_ticket_info(zgram)
-        if tracker:
+        for tracker, ticket in find_ticket_info(zgram):
             fetcher = fetchers.get(tracker)
             if fetcher:
                 if (zgram.opcode.lower() != 'auto' and
@@ -77,11 +70,15 @@ def main():
                     u, t = fetcher(ticket)
                     if not t:
                         t = 'Unable to identify ticket %s' % ticket
-                    zgram.opcode = 'auto'
-                    zgram.fields = [u,
-                                    '%s ticket %s: %s' % (tracker, ticket, t)]
-                    zgram.sender = 'debothena'
-                    zgram.send()
+                    z = zephyr.ZNotice()
+                    z.cls = zgram.cls
+                    z.instance = zgram.instance
+                    z.recipient = zgram.recipient
+                    z.opcode = 'auto'
+                    z.fields = [u,
+                                '%s ticket %s: %s' % (tracker, ticket, t)]
+                    z.sender = 'debothena'
+                    z.send()
                 last_seen[(tracker, ticket)] = time.time()
 
 
