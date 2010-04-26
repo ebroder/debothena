@@ -3,11 +3,12 @@ import re
 import urllib
 from lxml import etree
 import time
+import sys
 
 try:
     import zephyr
 except ImportError:
-    import site, sys
+    import site
     site.addsitedir('/mit/broder/lib/python%s/site-packages' % sys.version[:3])
     import zephyr
 
@@ -60,6 +61,8 @@ def main():
         zgram = zephyr.receive(True)
         if not zgram:
             continue
+        if zgram.opcode.lower() == 'kill':
+            sys.exit(0)
         if zgram.opcode.lower() == 'auto':
             continue
         tracker, ticket = find_ticket_info(zgram)
