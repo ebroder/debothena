@@ -1,9 +1,16 @@
 #!/usr/bin/python
 import re
-import zephyr
 import urllib
 from lxml import etree
 import time
+
+try:
+    import zephyr
+except ImportError:
+    import site, sys
+    site.addsitedir('/mit/broder/lib/python%s/site-packages' % sys.version[:3])
+    import zephyr
+
 
 last_seen = {}
 parser = etree.HTMLParser()
