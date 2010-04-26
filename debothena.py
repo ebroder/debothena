@@ -35,11 +35,14 @@ matchers = (
     )
 
 def fetch_debathena(ticket):
-    f = urllib.urlopen('http://debathena.mit.edu/trac/ticket/%s' % ticket)
+    u = 'http://debathena.mit.edu/trac/ticket/%s' % ticket
+    f = urllib.urlopen(u)
     t = etree.parse(f, parser)
     title = t.xpath('//h2[@class]/text()')
     if title:
-        return title[0]
+        return u, title[0]
+    else:
+        return u, None
 
 fetchers = {
     'Debathena': fetch_debathena,
@@ -71,11 +74,11 @@ def main():
             if fetcher:
                 if (zgram.opcode.lower() != 'auto' and
                     last_seen.get((tracker, ticket), 0) < time.time() - seen_timeout):
-                    t = fetcher(ticket)
+                    u, t = fetcher(ticket)
                     if not t:
                         t = 'Unable to identify ticket %s' % ticket
                     zgram.opcode = 'auto'
-                    zgram.fields = ['debothena',
+                    zgram.fields = [u,
                                     '%s ticket %s: %s' % (tracker, ticket, t)]
                     zgram.sender = 'debothena'
                     zgram.send()
