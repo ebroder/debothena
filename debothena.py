@@ -14,6 +14,7 @@ except ImportError:
 
 
 last_seen = {}
+seen_timeout = 30
 parser = etree.HTMLParser()
 
 def build_matcher(regex, flags=0):
@@ -64,13 +65,12 @@ def main():
             continue
         if zgram.opcode.lower() == 'kill':
             sys.exit(0)
-        if zgram.opcode.lower() == 'auto':
-            continue
         tracker, ticket = find_ticket_info(zgram)
         if tracker:
             fetcher = fetchers.get(tracker)
             if fetcher:
-                if last_seen.get((tracker, ticket), 0) < time.time() - 30:
+                if (zgram.opcode.lower() != 'auto' and
+                    last_seen.get((tracker, ticket), 0) < time.time() - seen_timeout):
                     t = fetcher(ticket)
                     if not t:
                         t = 'Unable to identify ticket %s' % ticket
