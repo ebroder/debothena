@@ -55,6 +55,7 @@ def main():
     subs = zephyr.Subscriptions()
     subs.add(('broder-test', '*', '*'))
     subs.add(('debathena', '*', '*'))
+    subs.add(('undebathena', '*', '*'))
 
     while True:
         zgram = zephyr.receive(True)
