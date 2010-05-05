@@ -24,9 +24,9 @@ def build_matcher(regex, flags=0):
     return match
 
 matchers = (
-    ('Debathena', [build_matcher(r'\btrac[-\s:]*#([0-9]+)\b', re.I)]),
+    ('Debathena', [build_matcher(r'\btrac[-\s:]*#([0-9]{1,5})\b', re.I)]),
 
-    ('Debathena', [build_matcher(r'#([0-9]+)\b')])
+    ('Debathena', [build_matcher(r'#([0-9]{1,5})\b')])
     )
 
 def fetch_debathena(ticket):
