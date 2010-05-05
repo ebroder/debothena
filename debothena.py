@@ -33,9 +33,9 @@ def fetch_debathena(ticket):
     u = 'http://debathena.mit.edu/trac/ticket/%s' % ticket
     f = urllib.urlopen(u)
     t = etree.parse(f, parser)
-    title = t.xpath('//h2[@class]/text()')
+    title = t.xpath('string(//h2[@class])')
     if title:
-        return u, title[0]
+        return u, title
     else:
         return u, None
 
