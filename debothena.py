@@ -14,7 +14,7 @@ except ImportError:
 
 
 last_seen = {}
-seen_timeout = 30
+seen_timeout = 5 * 60
 parser = etree.HTMLParser()
 
 def build_matcher(regex, flags=0):
