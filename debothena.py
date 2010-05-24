@@ -63,6 +63,7 @@ def main():
             continue
         if zgram.opcode.lower() == 'kill':
             sys.exit(0)
+        messages = []
         for tracker, ticket in find_ticket_info(zgram):
             fetcher = fetchers.get(tracker)
             if fetcher:
@@ -71,16 +72,17 @@ def main():
                     u, t = fetcher(ticket)
                     if not t:
                         t = 'Unable to identify ticket %s' % ticket
-                    z = zephyr.ZNotice()
-                    z.cls = zgram.cls
-                    z.instance = zgram.instance
-                    z.recipient = zgram.recipient
-                    z.opcode = 'auto'
-                    z.fields = [u,
-                                '%s ticket %s: %s' % (tracker, ticket, t)]
-                    z.sender = 'debothena'
-                    z.send()
+                    messages.append('%s ticket %s: %s' % (tracker, ticket, t))
                 last_seen[(tracker, ticket)] = time.time()
+        if messages:
+            z = zephyr.ZNotice()
+            z.cls = zgram.cls
+            z.instance = zgram.instance
+            z.recipient = zgram.recipient
+            z.opcode = 'auto'
+            z.sender = 'debothena'
+            z.fields = [u, '\n'.join(messages)]
+            z.send()
 
 
 if __name__ == '__main__':
