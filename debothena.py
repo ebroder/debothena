@@ -4,6 +4,8 @@ import urllib
 from lxml import etree
 import time
 import sys
+from random import choice
+import os
 
 try:
     import zephyr
@@ -50,6 +52,16 @@ def find_ticket_info(zgram):
             for t in ticket:
                 yield tracker, t
 
+def undebathena_fun():
+    u = 'http://debathena.mit.edu/trac/wiki/PackageNamesWeDidntUse'
+    f = urllib.urlopen(u)
+    t = etree.parse(f, parser)
+    package = choice(t.xpath('id("content")//li')).text.strip()
+    dir = choice(['/etc', '/bin', '/usr/bin', '/sbin', '/usr/sbin',
+                  '/dev/mapper', '/etc/default', '/var/run'])
+    file = choice(os.listdir(dir))
+    return u, "%s should divert %s/%s" % (package, dir, file)
+
 def main():
     zephyr.init()
     subs = zephyr.Subscriptions()
@@ -69,7 +81,10 @@ def main():
             if fetcher:
                 if (zgram.opcode.lower() != 'auto' and
                     last_seen.get((tracker, ticket), 0) < time.time() - seen_timeout):
-                    u, t = fetcher(ticket)
+                    if zgram.cls == 'undebathena':
+                        u, t = undebathena_fun()
+                    else:
+                        u, t = fetcher(ticket)
                     if not t:
                         t = 'Unable to identify ticket %s' % ticket
                     messages.append('%s ticket %s: %s' % (tracker, ticket, t))
