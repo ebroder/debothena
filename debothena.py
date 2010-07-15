@@ -80,7 +80,7 @@ def main():
             fetcher = fetchers.get(tracker)
             if fetcher:
                 if (zgram.opcode.lower() != 'auto' and
-                    last_seen.get((tracker, ticket), 0) < time.time() - seen_timeout):
+                    last_seen.get((tracker, ticket, zgram.cls), 0) < time.time() - seen_timeout):
                     if zgram.cls == 'undebathena':
                         u, t = undebathena_fun()
                     else:
@@ -88,7 +88,7 @@ def main():
                     if not t:
                         t = 'Unable to identify ticket %s' % ticket
                     messages.append('%s ticket %s: %s' % (tracker, ticket, t))
-                last_seen[(tracker, ticket)] = time.time()
+                last_seen[(tracker, ticket, zgram.cls)] = time.time()
         if messages:
             z = zephyr.ZNotice()
             z.cls = zgram.cls
